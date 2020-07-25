@@ -3,7 +3,7 @@ let globalState = {};
 let listeners = [];
 let actions = {};
 
-export const useStore = () => {
+export const useStore = (shouldListen = true) => {
   const setState = useState(globalState)[1];
   const dispatch = (actionIdentifire, payLoad) => {
     const newState = actions[actionIdentifire](globalState, payLoad);
@@ -15,12 +15,16 @@ export const useStore = () => {
   };
 
   useEffect(() => {
-    listeners.push(setState); //adding to compoent
+    if (shouldListen) {
+      listeners.push(setState); //adding to compoent
+    }
 
     return () => {
-      listeners = listeners.filter((li) => li !== setState); // removing from comppet
+      if (shouldListen) {
+        listeners = listeners.filter((li) => li !== setState); // removing from comppet
+      }
     };
-  }, [setState]);
+  }, [setState, shouldListen]);
 
   return [globalState, dispatch];
 };
